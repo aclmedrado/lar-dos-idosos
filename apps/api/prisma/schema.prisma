@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- ENUMS ---
+
+enum UserRole {
+  ADMIN
+  HEALTH
+  FINANCE
+  READ_ONLY
+}
+
+enum ResidentStatus {
+  ACTIVE
+  INACTIVE
+  HOSPITALIZED
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+}
+
+enum CashEntryType {
+  ENTRY
+  EXIT
+}
+
+// --- MODELS ---
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         UserRole @default(READ_ONLY)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Resident {
+  id         String         @id @default(uuid())
+  fullName   String
+  birthDate  DateTime
+  documentId String?        @unique
+  status     ResidentStatus @default(ACTIVE)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@map("residents")
+}
+
+model Employee {
+  id        String         @id @default(uuid())
+  fullName  String
+  roleName  String
+  phone     String?
+  status    EmployeeStatus @default(ACTIVE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@map("employees")
+}
+
+model CashEntry {
+  id          String        @id @default(uuid())
+  type        CashEntryType
+  description String
+  amount      Decimal       @db.Decimal(10, 2)
+  entryDate   DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("cash_entries")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  entity     String
+  entityId   String
+  action     String
+  actorName  String
+  createdAt  DateTime @default(now())
+
+  @@map("audit_logs")
+}

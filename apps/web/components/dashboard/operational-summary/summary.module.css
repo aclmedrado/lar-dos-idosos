@@ -1,0 +1,32 @@
+.summaryGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.summaryItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.label {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.value {
+  font-weight: 600;
+  color: var(--text-main);
+  background-color: var(--bg-color);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}

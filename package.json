@@ -1,0 +1,12 @@
+{
+  "name": "lar-dos-idosos-monorepo",
+  "private": true,
+  "packageManager": "pnpm@9.1.0",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "docker compose up --build"
+  }
+}

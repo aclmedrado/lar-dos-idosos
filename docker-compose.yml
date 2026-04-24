@@ -1,0 +1,55 @@
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: lar_idosos_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-lar_idosos_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-lar_idosos_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: lar_idosos_api
+    restart: unless-stopped
+    working_dir: /usr/src/app
+    command: pnpm --filter @lar/api run start:dev
+    ports:
+      - "${API_PORT:-3333}:3333"
+    env_file: .env
+    environment:
+      - PORT=${API_PORT:-3333}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/usr/src/app
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: lar_idosos_web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:3333}
+    depends_on:
+      - api
+    volumes:
+      - .:/usr/src/app
+
+volumes:
+  pgdata:

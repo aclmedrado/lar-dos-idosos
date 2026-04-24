@@ -1,0 +1,19 @@
+# Dependências
+node_modules/
+.pnpm-store/
+
+# Next.js
+.next/
+out/
+
+# NestJS
+dist/
+
+# Variáveis de Ambiente
+.env
+
+# Logs e SO
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
