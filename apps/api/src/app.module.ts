@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { PrismaService } from './prisma.service';
+import { ResidentsModule } from './residents/residents.module';
 
 @Module({
-  imports: [],
+  imports: [ResidentsModule],
   controllers: [AppController],
-  providers: [PrismaService], // Injeção do serviço global de banco de dados
+  providers: [PrismaService],
 })
 export class AppModule {}

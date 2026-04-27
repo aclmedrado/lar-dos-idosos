@@ -6,7 +6,7 @@ export default function FinanceiroPage() {
     <div>
       <PageHeader title="Financeiro / Livro Caixa" description="Controle de fluxo de caixa." />
       <Card>
-        <p style={{ color: 'var(--text-muted)' }}>Controle de receitas e despesas da instituição. Gerenciamento de categorias, datas de competência e cálculo de saldo acumulado.</p>
+        <p>Controle de receitas e despesas da instituição. Gerenciamento de categorias, datas de competência e cálculo de saldo acumulado.</p>
       </Card>
     </div>
   );

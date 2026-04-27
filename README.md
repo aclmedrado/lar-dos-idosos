@@ -1,10 +1,16 @@
 # 🏡 Associação Lar dos Idosos de Nazário — Sistema de Gestão
 
-## 📌 Visão Geral
+---
 
-Este projeto é um sistema web para gestão de um lar de idosos, desenvolvido com foco em simplicidade, evolução incremental (kaizen) e boas práticas modernas.
+## 📌 1. VISÃO GERAL
 
-O sistema irá contemplar módulos como:
+Sistema web para gestão de um lar de idosos, com foco em:
+
+* Simplicidade
+* Evolução incremental (kaizen)
+* Código limpo e sustentável
+
+### Módulos planejados:
 
 * Dashboard
 * Residentes
@@ -14,18 +20,22 @@ O sistema irá contemplar módulos como:
 
 ---
 
-## 🧱 Arquitetura
+## 🧱 2. ARQUITETURA DO PROJETO
 
-* **Monorepo (pnpm workspaces)**
-* **Backend**: NestJS (Node.js 24 + TypeScript)
-* **Frontend**: Next.js 15 (App Router)
-* **Banco de dados**: PostgreSQL 18
-* **ORM**: Prisma
-* **Infra local**: Docker Compose
+### Stack
 
-Estrutura:
+* **Backend:** NestJS + TypeScript
+* **Frontend:** Next.js 15 (App Router)
+* **Banco:** PostgreSQL 18
+* **ORM:** Prisma
+* **Infra:** Docker Compose
+* **Monorepo:** pnpm workspaces
 
-```
+---
+
+### Estrutura do projeto
+
+```bash id="y9k3tm"
 lar-dos-idosos/
 ├── apps/
 │   ├── api/        # Backend (NestJS + Prisma)
@@ -34,44 +44,47 @@ lar-dos-idosos/
 ├── .env
 ├── .env.example
 ├── pnpm-workspace.yaml
+├── README.md
 ```
 
 ---
 
-## ⚙️ Ambiente de Desenvolvimento
+## ⚙️ 3. SETUP DO AMBIENTE
 
-Requisitos:
+### Pré-requisitos
 
 * Windows 11 + WSL
 * Docker + Docker Compose
-* Node.js 24 (via corepack)
+* Node.js 24
 * pnpm
 
 ---
 
-## 🚀 Setup Inicial
+### Instalar dependências
 
-### 1. Instalar dependências (host)
-
-```bash
+```bash id="z8pnq5"
 pnpm install -r
 ```
 
-### 2. Criar arquivo de ambiente
+---
 
-```bash
+### Criar arquivo de ambiente
+
+```bash id="v6d2kp"
 cp .env.example .env
 ```
 
 ---
 
-## 🐳 Subindo o ambiente
+## 🐳 4. SUBINDO O PROJETO
 
-```bash
+```bash id="c8yq2s"
 docker compose up --build
 ```
 
-Serviços:
+---
+
+### URLs
 
 * Frontend: http://localhost:3000
 * Backend: http://localhost:3333
@@ -79,96 +92,146 @@ Serviços:
 
 ---
 
-## 🗄️ Banco de Dados (Prisma)
+## 🗄️ 5. BANCO DE DADOS (PRISMA)
 
-### 🔑 Variável de conexão
+### Variável de conexão
 
-Definida em `.env`:
-
-```env
+```env id="z4fwc1"
 DATABASE_URL="postgresql://postgres:postgres@db:5432/lar_idosos_db?schema=public"
 ```
 
 ---
 
-## 📦 Executando Migrations (IMPORTANTE)
+## 🔧 6. MIGRATIONS (IMPORTANTE)
 
-Como o projeto é um monorepo, os comandos do Prisma devem ser executados **dentro do app da API**.
+### Executar migration no monorepo
 
-### Criar e aplicar migration:
-
-```bash
+```bash id="xqg7m1"
 docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev --name init
 ```
 
-### Gerar client manualmente (se necessário):
+---
 
-```bash
+### Gerar Prisma Client
+
+```bash id="t3z4la"
 docker compose exec -w /usr/src/app/apps/api api pnpm prisma generate
 ```
 
 ---
 
-## 🧠 Padrão de Execução no Monorepo
+## ⚠️ 7. REGRA DO MONOREPO (CRÍTICA)
 
-⚠️ Regra importante:
+👉 Sempre lembrar:
 
-* O container roda na raiz: `/usr/src/app`
+* O container roda em: `/usr/src/app`
 * O Prisma está em: `/usr/src/app/apps/api`
 
-➡️ Portanto:
+✔ Portanto:
 
 * Sempre usar `-w /usr/src/app/apps/api`
 * OU usar `pnpm --filter`
 
 ---
 
-## 📡 Backend (NestJS)
+## 📡 8. BACKEND (NESTJS)
 
 ### Endpoint de saúde
 
-```
+```http id="lmv8c2"
 GET /health
 ```
 
 ---
 
-## 🧩 Módulos do Backend
+## 🧩 9. API DE RESIDENTES (T-005)
 
-Atualmente implementado:
+### Endpoints disponíveis
 
-* Residents (T-005 em andamento)
-
----
-
-## 🎯 Filosofia de Desenvolvimento
-
-Este projeto segue:
-
-* **Kaizen** (evolução incremental)
-* **Escopo controlado por ticket**
-* **Sem antecipação de complexidade**
-* **Sem overengineering**
+```http id="n9f2qb"
+GET    /residents
+GET    /residents/:id
+POST   /residents
+```
 
 ---
 
-## 🚫 Regras Importantes
+### Criar residente
 
-* Não implementar funcionalidades fora do ticket atual
-* Não adicionar bibliotecas sem aprovação
-* Não antecipar domínio complexo
-* Não misturar frontend com backend
+```bash id="k7xpq1"
+curl -X POST http://localhost:3333/residents \
+-H "Content-Type: application/json" \
+-d '{"fullName": "Maria da Silva", "birthDate": "1940-05-10", "documentId": "12345678900"}'
+```
+
+---
+
+### Listar residentes
+
+```bash id="f3p8zn"
+curl http://localhost:3333/residents
+```
+
+---
+
+### Buscar por ID
+
+```bash id="v1t9xa"
+curl http://localhost:3333/residents/SEU_ID_AQUI
+```
+
+---
+
+### Resposta esperada
+
+```json id="j4c2mu"
+{
+  "id": "uuid",
+  "fullName": "Maria da Silva",
+  "birthDate": "1940-05-10T00:00:00.000Z",
+  "status": "ACTIVE"
+}
+```
+
+---
+
+### Validações
+
+* `fullName` → obrigatório
+* `birthDate` → obrigatório (formato ISO)
+* `documentId` → opcional
+* Campos extras → rejeitados automaticamente
+
+---
+
+## 🎯 10. FILOSOFIA DE DESENVOLVIMENTO
+
+* Kaizen (evolução incremental)
+* Escopo controlado por ticket
+* Sem antecipação de complexidade
+* Sem overengineering
+
+---
+
+## 🚫 11. REGRAS DO PROJETO
+
+* Não implementar fora do ticket
+* Não adicionar libs sem aprovação
+* Não alterar infraestrutura sem revisão
 * Não quebrar tickets anteriores
+* Não misturar frontend e backend
 
 ---
 
-## 📌 Convenções
+## 📌 12. CONVENÇÕES
 
 ### Backend
 
-* Controller → entrada HTTP
-* Service → regra simples + Prisma
-* DTO → validação com class-validator
+* Controller → HTTP
+* Service → lógica + Prisma
+* DTO → validação
+
+---
 
 ### Banco
 
@@ -178,33 +241,41 @@ Este projeto segue:
 
 ---
 
-## 📍 Status Atual do Projeto
+## 📍 13. STATUS DO PROJETO
 
-* ✅ T-001: Bootstrap
-* ✅ T-002: Layout base
-* ✅ T-003: Dashboard mockado
-* ✅ T-004: Prisma + migration
-* 🔄 T-005: API de Residentes (em andamento)
-
----
-
-## 🧭 Próximos Passos
-
-* CRUD completo de residentes
-* Funcionários
-* Prontuários
-* Financeiro
+* ✅ T-001 — Bootstrap
+* ✅ T-002 — Layout base
+* ✅ T-003 — Dashboard mockado
+* ✅ T-004 — Prisma + migration
+* ✅ T-005 — API de residentes
 
 ---
 
-## 🧑‍💻 Observação Final
+## 🚀 14. PRÓXIMO PASSO
 
-Este projeto é conduzido por:
+👉 T-006 — CRUD completo de residentes
 
-* Líder Técnico (PO)
-* Desenvolvedor (Gemini)
-* Arquiteto (ChatGPT)
-
-Toda implementação deve seguir rigorosamente os tickets definidos.
+* PUT /residents/:id
+* DELETE /residents/:id
+* validações adicionais
+* melhorias de erro
 
 ---
+
+## 🧠 15. ORGANIZAÇÃO DO TIME
+
+* Líder Técnico / PO → você
+* Desenvolvedor → Gemini
+* Arquiteto → ChatGPT
+
+---
+
+## 📎 16. OBSERVAÇÃO FINAL
+
+Sempre validar alterações com:
+
+* logs reais
+* curl
+* docker funcionando
+
+Antes de avançar para o próximo ticket.

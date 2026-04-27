@@ -6,7 +6,7 @@ export default function ProntuariosPage() {
     <div>
       <PageHeader title="Prontuários" description="Informações médicas e de saúde." />
       <Card>
-        <p style={{ color: 'var(--text-muted)' }}>Gestão médica dos residentes. Contempla o registro de alergias, doenças crônicas, deficiências e controle de medicamentos de uso contínuo.</p>
+        <p>Gestão médica dos residentes. Contempla o registro de alergias, doenças crônicas, deficiências e controle de medicamentos de uso contínuo.</p>
       </Card>
     </div>
   );

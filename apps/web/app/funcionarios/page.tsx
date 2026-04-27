@@ -6,7 +6,7 @@ export default function FuncionariosPage() {
     <div>
       <PageHeader title="Funcionários" description="Gestão da equipe de trabalho." />
       <Card>
-        <p style={{ color: 'var(--text-muted)' }}>Módulo para gestão da equipe. Aqui será feito o cadastro de funcionários, definição de funções/cargos e status de atividade.</p>
+        <p>Módulo para gestão da equipe. Aqui será feito o cadastro de funcionários, definição de funções/cargos e status de atividade.</p>
       </Card>
     </div>
   );
