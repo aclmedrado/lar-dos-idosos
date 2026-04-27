@@ -148,10 +148,12 @@ GET /health
 
 ### Endpoints disponíveis
 
-```http id="n9f2qb"
+```http
 GET    /residents
 GET    /residents/:id
 POST   /residents
+PATCH  /residents/:id
+DELETE /residents/:id
 ```
 
 ---
@@ -182,6 +184,21 @@ curl http://localhost:3333/residents/SEU_ID_AQUI
 
 ---
 
+### Atualizar residente
+curl -X PATCH http://localhost:3333/residents/SEU_ID_AQUI \
+-H "Content-Type: application/json" \
+-d '{"fullName": "Maria Aparecida da Silva"}'
+
+---
+
+### Remover residente logicamente
+
+curl -X DELETE http://localhost:3333/residents/SEU_ID_AQUI
+A remoção não apaga o registro do banco. Ela altera o status do residente para:
+{
+  "status": "INACTIVE"
+}
+
 ### Resposta esperada
 
 ```json id="j4c2mu"
@@ -197,11 +214,14 @@ curl http://localhost:3333/residents/SEU_ID_AQUI
 
 ### Validações
 
-* `fullName` → obrigatório
-* `birthDate` → obrigatório (formato ISO)
-* `documentId` → opcional
+* fullName → obrigatório na criação
+* birthDate → obrigatório na criação, em formato ISO
+* documentId → opcional
+* status → opcional na atualização
 * Campos extras → rejeitados automaticamente
-
+* UUID inválido em :id → retorna 400 Bad Request
+* residente inexistente → retorna 404 Not Found
+* documentId duplicado → retorna 409 Conflict
 ---
 
 ## 🎯 10. FILOSOFIA DE DESENVOLVIMENTO
