@@ -10,7 +10,7 @@ Sistema web para gestão de um lar de idosos, com foco em:
 * Evolução incremental (kaizen)
 * Código limpo e sustentável
 
-### Módulos planejados:
+### Módulos planejados
 
 * Dashboard
 * Residentes
@@ -24,18 +24,18 @@ Sistema web para gestão de um lar de idosos, com foco em:
 
 ### Stack
 
-* **Backend:** NestJS + TypeScript
-* **Frontend:** Next.js 15 (App Router)
-* **Banco:** PostgreSQL 18
-* **ORM:** Prisma
-* **Infra:** Docker Compose
-* **Monorepo:** pnpm workspaces
+* Backend: NestJS + TypeScript
+* Frontend: Next.js 15 (App Router)
+* Banco de dados: PostgreSQL 18
+* ORM: Prisma
+* Infraestrutura: Docker Compose
+* Monorepo: pnpm workspaces
 
 ---
 
 ### Estrutura do projeto
 
-```bash id="y9k3tm"
+```bash
 lar-dos-idosos/
 ├── apps/
 │   ├── api/        # Backend (NestJS + Prisma)
@@ -62,7 +62,7 @@ lar-dos-idosos/
 
 ### Instalar dependências
 
-```bash id="z8pnq5"
+```bash
 pnpm install -r
 ```
 
@@ -70,7 +70,7 @@ pnpm install -r
 
 ### Criar arquivo de ambiente
 
-```bash id="v6d2kp"
+```bash
 cp .env.example .env
 ```
 
@@ -78,7 +78,7 @@ cp .env.example .env
 
 ## 🐳 4. SUBINDO O PROJETO
 
-```bash id="c8yq2s"
+```bash
 docker compose up --build
 ```
 
@@ -96,7 +96,7 @@ docker compose up --build
 
 ### Variável de conexão
 
-```env id="z4fwc1"
+```env
 DATABASE_URL="postgresql://postgres:postgres@db:5432/lar_idosos_db?schema=public"
 ```
 
@@ -106,7 +106,7 @@ DATABASE_URL="postgresql://postgres:postgres@db:5432/lar_idosos_db?schema=public
 
 ### Executar migration no monorepo
 
-```bash id="xqg7m1"
+```bash
 docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev --name init
 ```
 
@@ -114,7 +114,7 @@ docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev --name 
 
 ### Gerar Prisma Client
 
-```bash id="t3z4la"
+```bash
 docker compose exec -w /usr/src/app/apps/api api pnpm prisma generate
 ```
 
@@ -138,13 +138,15 @@ docker compose exec -w /usr/src/app/apps/api api pnpm prisma generate
 
 ### Endpoint de saúde
 
-```http id="lmv8c2"
+```http
 GET /health
 ```
 
 ---
 
-## 🧩 9. API DE RESIDENTES (T-005)
+## 🧩 9. API DE RESIDENTES
+
+Módulo de gestão de residentes implementado com operações básicas de CRUD no backend.
 
 ### Endpoints disponíveis
 
@@ -160,7 +162,7 @@ DELETE /residents/:id
 
 ### Criar residente
 
-```bash id="k7xpq1"
+```bash
 curl -X POST http://localhost:3333/residents \
 -H "Content-Type: application/json" \
 -d '{"fullName": "Maria da Silva", "birthDate": "1940-05-10", "documentId": "12345678900"}'
@@ -170,43 +172,41 @@ curl -X POST http://localhost:3333/residents \
 
 ### Listar residentes
 
-```bash id="f3p8zn"
+```bash
 curl http://localhost:3333/residents
 ```
 
 ---
 
-### Buscar por ID
+### Buscar residente por ID
 
-```bash id="v1t9xa"
+```bash
 curl http://localhost:3333/residents/SEU_ID_AQUI
 ```
 
 ---
 
 ### Atualizar residente
+
+```bash
 curl -X PATCH http://localhost:3333/residents/SEU_ID_AQUI \
 -H "Content-Type: application/json" \
 -d '{"fullName": "Maria Aparecida da Silva"}'
+```
 
 ---
 
 ### Remover residente logicamente
 
+```bash
 curl -X DELETE http://localhost:3333/residents/SEU_ID_AQUI
+```
+
 A remoção não apaga o registro do banco. Ela altera o status do residente para:
+
+```json
 {
   "status": "INACTIVE"
-}
-
-### Resposta esperada
-
-```json id="j4c2mu"
-{
-  "id": "uuid",
-  "fullName": "Maria da Silva",
-  "birthDate": "1940-05-10T00:00:00.000Z",
-  "status": "ACTIVE"
 }
 ```
 
@@ -214,14 +214,15 @@ A remoção não apaga o registro do banco. Ela altera o status do residente par
 
 ### Validações
 
-* fullName → obrigatório na criação
-* birthDate → obrigatório na criação, em formato ISO
-* documentId → opcional
-* status → opcional na atualização
+* `fullName` → obrigatório na criação
+* `birthDate` → obrigatório na criação (formato ISO)
+* `documentId` → opcional
+* `status` → opcional na atualização
 * Campos extras → rejeitados automaticamente
-* UUID inválido em :id → retorna 400 Bad Request
-* residente inexistente → retorna 404 Not Found
-* documentId duplicado → retorna 409 Conflict
+* UUID inválido → retorna `400 Bad Request`
+* Residente inexistente → retorna `404 Not Found`
+* `documentId` duplicado → retorna `409 Conflict`
+
 ---
 
 ## 🎯 10. FILOSOFIA DE DESENVOLVIMENTO
@@ -235,11 +236,11 @@ A remoção não apaga o registro do banco. Ela altera o status do residente par
 
 ## 🚫 11. REGRAS DO PROJETO
 
-* Não implementar fora do ticket
-* Não adicionar libs sem aprovação
+* Não implementar fora do ticket atual
+* Não adicionar bibliotecas sem aprovação
 * Não alterar infraestrutura sem revisão
 * Não quebrar tickets anteriores
-* Não misturar frontend e backend
+* Não misturar frontend com backend
 
 ---
 
@@ -247,9 +248,9 @@ A remoção não apaga o registro do banco. Ela altera o status do residente par
 
 ### Backend
 
-* Controller → HTTP
+* Controller → entrada HTTP
 * Service → lógica + Prisma
-* DTO → validação
+* DTO → validação com class-validator
 
 ---
 
@@ -267,18 +268,18 @@ A remoção não apaga o registro do banco. Ela altera o status do residente par
 * ✅ T-002 — Layout base
 * ✅ T-003 — Dashboard mockado
 * ✅ T-004 — Prisma + migration
-* ✅ T-005 — API de residentes
+* ✅ T-005 — API inicial de residentes
+* ✅ T-006 — CRUD completo de residentes
 
 ---
 
 ## 🚀 14. PRÓXIMO PASSO
 
-👉 T-006 — CRUD completo de residentes
+👉 T-007 — Integração do frontend com API de residentes
 
-* PUT /residents/:id
-* DELETE /residents/:id
-* validações adicionais
-* melhorias de erro
+* consumir endpoints no Next.js
+* listar residentes na interface
+* criar fluxo básico de cadastro
 
 ---
 
