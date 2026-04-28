@@ -1,15 +1,18 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
-import { createResident } from '@/lib/residents';
+import { createResident, updateResident } from '@/lib/residents';
+import { Resident } from '@/types/resident';
 import styles from './residents-form.module.css';
 
 interface ResidentsFormProps {
   onSuccess: () => void;
+  editingResident: Resident | null;
+  onCancelEdit: () => void;
 }
 
-export function ResidentsForm({ onSuccess }: ResidentsFormProps) {
+export function ResidentsForm({ onSuccess, editingResident, onCancelEdit }: ResidentsFormProps) {
   const [fullName, setFullName] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [documentId, setDocumentId] = useState('');
@@ -18,12 +21,26 @@ export function ResidentsForm({ onSuccess }: ResidentsFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  useEffect(() => {
+    setError(null);
+    setSuccess(null);
+
+    if (editingResident) {
+      setFullName(editingResident.fullName);
+      setBirthDate(editingResident.birthDate.split('T')[0]);
+      setDocumentId(editingResident.documentId || '');
+    } else {
+      setFullName('');
+      setBirthDate('');
+      setDocumentId('');
+    }
+  }, [editingResident]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
 
-    // Validação local simples
     if (!fullName.trim() || !birthDate) {
       setError('Nome completo e Data de nascimento são obrigatórios.');
       return;
@@ -31,21 +48,27 @@ export function ResidentsForm({ onSuccess }: ResidentsFormProps) {
 
     setIsLoading(true);
     try {
-      await createResident({
+      const payload = {
         fullName,
         birthDate,
         documentId: documentId.trim() || undefined,
-      });
+      };
 
-      setSuccess('Residente cadastrado com sucesso!');
+      if (editingResident) {
+        await updateResident(editingResident.id, payload);
+        setSuccess('Residente atualizado com sucesso!');
+      } else {
+        await createResident(payload);
+        setSuccess('Residente cadastrado com sucesso!');
+      }
+
       setFullName('');
       setBirthDate('');
       setDocumentId('');
-      onSuccess(); // Atualiza a lista na tela
+      onSuccess();
       
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : 'Erro ao cadastrar residente.';
+      const message = err instanceof Error ? err.message : 'Erro ao processar residente.';
       setError(message);
     } finally {
       setIsLoading(false);
@@ -53,7 +76,7 @@ export function ResidentsForm({ onSuccess }: ResidentsFormProps) {
   };
 
   return (
-    <Card title="Novo Residente">
+    <Card title={editingResident ? "Editar Residente" : "Novo Residente"}>
       <form onSubmit={handleSubmit} className={styles.form}>
         {error && <div className={styles.error}>{error}</div>}
         {success && <div className={styles.success}>{success}</div>}
@@ -96,9 +119,24 @@ export function ResidentsForm({ onSuccess }: ResidentsFormProps) {
           />
         </div>
 
-        <button type="submit" className={styles.button} disabled={isLoading}>
-          {isLoading ? 'Cadastrando...' : 'Cadastrar Residente'}
-        </button>
+        <div className={styles.buttonGroup}>
+          <button type="submit" className={styles.button} disabled={isLoading}>
+            {isLoading 
+              ? 'Salvando...' 
+              : editingResident ? 'Salvar alterações' : 'Cadastrar Residente'}
+          </button>
+          
+          {editingResident && (
+            <button 
+              type="button" 
+              className={styles.cancelButton} 
+              onClick={onCancelEdit}
+              disabled={isLoading}
+            >
+              Cancelar edição
+            </button>
+          )}
+        </div>
       </form>
     </Card>
   );

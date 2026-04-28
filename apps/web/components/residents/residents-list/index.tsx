@@ -9,10 +9,11 @@ interface ResidentsListProps {
   residents: Resident[];
   isLoading: boolean;
   error: string | null;
+  onEdit: (resident: Resident) => void;
+  onInactivate: (id: string) => void;
 }
 
-export function ResidentsList({ residents, isLoading, error }: ResidentsListProps) {
-  // Corrige problema de fuso horário ao renderizar a data ISO
+export function ResidentsList({ residents, isLoading, error, onEdit, onInactivate }: ResidentsListProps) {
   const formatDate = (isoString: string) => {
     return new Date(isoString).toLocaleDateString('pt-BR', { timeZone: 'UTC' });
   };
@@ -36,17 +37,42 @@ export function ResidentsList({ residents, isLoading, error }: ResidentsListProp
                 <th className={styles.th}>Nascimento</th>
                 <th className={styles.th}>Documento</th>
                 <th className={styles.th}>Status</th>
+                <th className={styles.th}>Ações</th>
               </tr>
             </thead>
             <tbody>
-              {residents.map((resident) => (
-                <tr key={resident.id}>
-                  <td className={styles.td}><strong>{resident.fullName}</strong></td>
-                  <td className={styles.td}>{formatDate(resident.birthDate)}</td>
-                  <td className={styles.td}>{resident.documentId || 'Não informado'}</td>
-                  <td className={styles.td}>{resident.status}</td>
-                </tr>
-              ))}
+              {residents.map((resident) => {
+                const isInactive = resident.status === 'INACTIVE';
+                return (
+                  <tr key={resident.id} className={isInactive ? styles.inactiveRow : ''}>
+                    <td className={styles.td}><strong>{resident.fullName}</strong></td>
+                    <td className={styles.td}>{formatDate(resident.birthDate)}</td>
+                    <td className={styles.td}>{resident.documentId || 'Não informado'}</td>
+                    <td className={styles.td}>
+                      <span className={isInactive ? styles.statusInactive : styles.statusActive}>
+                        {resident.status}
+                      </span>
+                    </td>
+                    <td className={styles.td}>
+                      <div className={styles.actions}>
+                        <button 
+                          className={styles.actionBtnEdit} 
+                          onClick={() => onEdit(resident)}
+                        >
+                          Editar
+                        </button>
+                        <button 
+                          className={styles.actionBtnDelete} 
+                          onClick={() => onInactivate(resident.id)}
+                          disabled={isInactive}
+                        >
+                          Inativar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

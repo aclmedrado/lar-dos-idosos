@@ -27,7 +27,7 @@
 }
 
 .input:focus {
-  border-color: #3b82f6; /* Azul base */
+  border-color: #3b82f6;
 }
 
 .button {
@@ -65,4 +65,32 @@
   color: #166534;
   border-radius: 6px;
   font-size: 0.9rem;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.cancelButton {
+  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancelButton:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  color: var(--text-main);
+}
+
+.cancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

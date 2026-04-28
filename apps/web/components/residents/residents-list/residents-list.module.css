@@ -41,3 +41,60 @@
 .table tbody tr:last-child .td {
   border-bottom: none;
 }
+
+.inactiveRow {
+  opacity: 0.6;
+}
+
+.statusActive {
+  color: #166534;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.statusInactive {
+  color: #b91c1c;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionBtnEdit, .actionBtnDelete {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.actionBtnEdit {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  border-color: #d1d5db;
+}
+
+.actionBtnEdit:hover {
+  background-color: #e5e7eb;
+}
+
+.actionBtnDelete {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+.actionBtnDelete:hover:not(:disabled) {
+  background-color: #fecaca;
+}
+
+.actionBtnDelete:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(100%);
+}

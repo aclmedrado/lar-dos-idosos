@@ -13,3 +13,9 @@ export interface CreateResidentInput {
   birthDate: string;
   documentId?: string;
 }
+
+export interface UpdateResidentInput {
+  fullName?: string;
+  birthDate?: string;
+  documentId?: string;
+}

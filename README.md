@@ -4,7 +4,7 @@
 
 ## 📌 1. VISÃO GERAL
 
-Sistema web para gestão de um lar de idosos, com foco em:
+Sistema web para gestão de um lar de idosos, desenvolvido com foco em:
 
 * Simplicidade
 * Evolução incremental (kaizen)
@@ -122,8 +122,6 @@ docker compose exec -w /usr/src/app/apps/api api pnpm prisma generate
 
 ## ⚠️ 7. REGRA DO MONOREPO (CRÍTICA)
 
-👉 Sempre lembrar:
-
 * O container roda em: `/usr/src/app`
 * O Prisma está em: `/usr/src/app/apps/api`
 
@@ -146,9 +144,9 @@ GET /health
 
 ## 🧩 9. API DE RESIDENTES
 
-Módulo de gestão de residentes implementado com operações básicas de CRUD no backend.
+CRUD completo de residentes disponível no backend.
 
-### Endpoints disponíveis
+### Endpoints
 
 ```http
 GET    /residents
@@ -170,22 +168,6 @@ curl -X POST http://localhost:3333/residents \
 
 ---
 
-### Listar residentes
-
-```bash
-curl http://localhost:3333/residents
-```
-
----
-
-### Buscar residente por ID
-
-```bash
-curl http://localhost:3333/residents/SEU_ID_AQUI
-```
-
----
-
 ### Atualizar residente
 
 ```bash
@@ -196,107 +178,149 @@ curl -X PATCH http://localhost:3333/residents/SEU_ID_AQUI \
 
 ---
 
-### Remover residente logicamente
+### Inativar residente (soft delete)
 
 ```bash
 curl -X DELETE http://localhost:3333/residents/SEU_ID_AQUI
 ```
 
-A remoção não apaga o registro do banco. Ela altera o status do residente para:
+---
 
-```json
-{
-  "status": "INACTIVE"
-}
+### Regras
+
+* `fullName` obrigatório na criação
+* `birthDate` obrigatório (ISO)
+* `documentId` opcional
+* UUID inválido → 400
+* não encontrado → 404
+* documento duplicado → 409
+* DELETE não remove do banco → apenas `status = INACTIVE`
+
+---
+
+## 💻 10. FRONTEND — RESIDENTES
+
+### Página
+
+```txt
+http://localhost:3000/residentes
 ```
 
 ---
 
-### Validações
+### Funcionalidades implementadas
 
-* `fullName` → obrigatório na criação
-* `birthDate` → obrigatório na criação (formato ISO)
-* `documentId` → opcional
-* `status` → opcional na atualização
-* Campos extras → rejeitados automaticamente
-* UUID inválido → retorna `400 Bad Request`
-* Residente inexistente → retorna `404 Not Found`
-* `documentId` duplicado → retorna `409 Conflict`
+* Listagem de residentes via API
+* Cadastro de residente
+* Edição de residente
+* Inativação (soft delete)
+* Atualização automática da lista
+* Feedback de erro e sucesso
 
 ---
 
-## 🎯 10. FILOSOFIA DE DESENVOLVIMENTO
+### Fluxo de uso
 
-* Kaizen (evolução incremental)
-* Escopo controlado por ticket
-* Sem antecipação de complexidade
+1. Criar residente pelo formulário
+2. Visualizar na lista
+3. Editar clicando em “Editar”
+4. Cancelar edição se necessário
+5. Inativar clicando em “Inativar”
+
+---
+
+### Regras de UI
+
+* Residentes inativos permanecem visíveis
+* Linhas inativas possuem aparência reduzida
+* Botão de inativar fica desabilitado após uso
+* Formulário alterna entre modo criação e edição
+
+---
+
+## 🌐 11. VARIÁVEIS DE AMBIENTE (FRONTEND)
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3333
+```
+
+---
+
+## 🎯 12. FILOSOFIA DE DESENVOLVIMENTO
+
+* Kaizen (incremental)
+* Escopo por ticket
 * Sem overengineering
+* Sem antecipação de complexidade
 
 ---
 
-## 🚫 11. REGRAS DO PROJETO
+## 🚫 13. REGRAS DO PROJETO
 
-* Não implementar fora do ticket atual
-* Não adicionar bibliotecas sem aprovação
+* Não implementar fora do ticket
+* Não adicionar libs sem aprovação
 * Não alterar infraestrutura sem revisão
-* Não quebrar tickets anteriores
-* Não misturar frontend com backend
+* Não quebrar funcionalidades existentes
+* Backend e frontend desacoplados
 
 ---
 
-## 📌 12. CONVENÇÕES
+## 📌 14. CONVENÇÕES
 
 ### Backend
 
-* Controller → entrada HTTP
+* Controller → HTTP
 * Service → lógica + Prisma
-* DTO → validação com class-validator
+* DTO → validação
+
+### Frontend
+
+* Client Components para interação
+* Fetch centralizado em `lib/`
+* CSS Modules
+* Componentes pequenos e reutilizáveis
 
 ---
 
-### Banco
-
-* UUID como ID
-* Enums para status
-* createdAt / updatedAt padrão
-
----
-
-## 📍 13. STATUS DO PROJETO
+## 📍 15. STATUS DO PROJETO
 
 * ✅ T-001 — Bootstrap
 * ✅ T-002 — Layout base
 * ✅ T-003 — Dashboard mockado
 * ✅ T-004 — Prisma + migration
 * ✅ T-005 — API inicial de residentes
-* ✅ T-006 — CRUD completo de residentes
+* ✅ T-006 — CRUD backend completo
+* ✅ T-007 — Front consumindo API
+* ✅ T-008 — Gestão completa no frontend
 
 ---
 
-## 🚀 14. PRÓXIMO PASSO
+## 🚀 16. PRÓXIMOS PASSOS
 
-👉 T-007 — Integração do frontend com API de residentes
+Possíveis evoluções:
 
-* consumir endpoints no Next.js
-* listar residentes na interface
-* criar fluxo básico de cadastro
+* T-009 — Refinamento de UX
+* T-010 — Módulo de Funcionários
+* T-011 — Prontuários médicos
+* T-012 — Financeiro (livro caixa)
 
 ---
 
-## 🧠 15. ORGANIZAÇÃO DO TIME
+## 🧠 17. ORGANIZAÇÃO DO TIME
 
-* Líder Técnico / PO → você
+* Product Owner / Líder Técnico → você
 * Desenvolvedor → Gemini
-* Arquiteto → ChatGPT
+* Arquiteto / CTO → ChatGPT
 
 ---
 
-## 📎 16. OBSERVAÇÃO FINAL
+## 📎 18. OBSERVAÇÃO FINAL
 
-Sempre validar alterações com:
+Sempre validar:
 
 * logs reais
-* curl
-* docker funcionando
+* testes via UI
+* testes via curl
+* comportamento completo do fluxo
 
 Antes de avançar para o próximo ticket.
