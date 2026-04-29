@@ -4,15 +4,15 @@
 
 ## 📌 1. VISÃO GERAL
 
-Sistema web para gestão de um lar de idosos, desenvolvido com foco em:
+Sistema web para gestão de um lar de idosos, com foco em:
 
 * Simplicidade
-* Evolução incremental (kaizen)
+* Evolução incremental (Kaizen)
 * Código limpo e sustentável
 
 ---
 
-### Módulos do sistema
+## 🧩 Módulos do sistema
 
 * Dashboard
 * Residentes ✅
@@ -27,8 +27,8 @@ Sistema web para gestão de um lar de idosos, desenvolvido com foco em:
 ### Stack
 
 * Backend: NestJS + TypeScript
-* Frontend: Next.js 15 (App Router)
-* Banco de dados: PostgreSQL
+* Frontend: Next.js (App Router)
+* Banco: PostgreSQL
 * ORM: Prisma
 * Infraestrutura: Docker Compose
 * Monorepo: pnpm workspaces
@@ -70,7 +70,7 @@ pnpm install -r
 
 ---
 
-### Criar arquivo de ambiente
+### Configurar ambiente
 
 ```bash
 cp .env.example .env
@@ -88,13 +88,13 @@ docker compose up --build
 
 ### URLs
 
-* Frontend: http://localhost:3000
-* Backend: http://localhost:3333
-* Healthcheck: http://localhost:3333/health
+* Frontend → http://localhost:3000
+* Backend → http://localhost:3333
+* Healthcheck → http://localhost:3333/health
 
 ---
 
-## 🗄️ 5. BANCO DE DADOS (PRISMA)
+## 🗄️ 5. BANCO DE DADOS
 
 ### Variável de conexão
 
@@ -114,10 +114,7 @@ docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev
 
 ## ⚠️ 7. REGRA DO MONOREPO
 
-* Container roda em: `/usr/src/app`
-* Prisma está em: `/usr/src/app/apps/api`
-
-✔ Sempre usar:
+Sempre usar:
 
 ```bash
 docker compose exec -w /usr/src/app/apps/api api ...
@@ -137,8 +134,6 @@ GET /health
 
 ## 🧩 9. API DE RESIDENTES
 
-CRUD completo de residentes.
-
 ### Endpoints
 
 ```http
@@ -153,16 +148,14 @@ DELETE /residents/:id
 
 ### Regras
 
-* `fullName` obrigatório
-* `birthDate` obrigatório
-* `documentId` opcional (único)
-* Soft delete com `status = INACTIVE`
+* Nome obrigatório
+* Data de nascimento obrigatória
+* Documento opcional (único)
+* Soft delete (`status = INACTIVE`)
 
 ---
 
 ## 🧩 10. API DE FUNCIONÁRIOS
-
-CRUD completo de funcionários.
 
 ### Endpoints
 
@@ -176,52 +169,49 @@ DELETE /employees/:id
 
 ---
 
-### Criar funcionário
-
-```bash
-curl -X POST http://localhost:3333/employees \
--H "Content-Type: application/json" \
--d '{"fullName": "João Silva", "role": "Cuidador"}'
-```
-
----
-
 ### Regras
 
-* `fullName` obrigatório
-* `role` obrigatório
-* `documentId` opcional (único)
-* `email` opcional (validado)
-* `phone` opcional
-* Soft delete com `status = INACTIVE`
-
----
-
-### Validações
-
-* UUID inválido → 400
-* não encontrado → 404
-* documento duplicado → 409
+* Nome obrigatório
+* Cargo obrigatório
+* Documento opcional (único)
+* Email validado
+* Soft delete (`status = INACTIVE`)
 
 ---
 
 ## 💻 11. FRONTEND
 
-### Página de residentes
+---
+
+### 🔹 Página de Residentes
 
 ```txt
 http://localhost:3000/residentes
 ```
 
----
+#### Funcionalidades
 
-### Funcionalidades
-
-* Listagem via API
+* Listagem
 * Cadastro
 * Edição
 * Inativação
-* Feedback de erro/sucesso
+* Feedback visual
+
+---
+
+### 🔹 Página de Funcionários
+
+```txt
+http://localhost:3000/funcionarios
+```
+
+#### Funcionalidades
+
+* Listagem
+* Cadastro
+* Edição
+* Inativação
+* Feedback visual
 
 ---
 
@@ -233,36 +223,33 @@ NEXT_PUBLIC_API_URL=http://localhost:3333
 
 ---
 
-## 🧱 13. PADRÃO DE ARQUITETURA (IMPORTANTE)
+## 🧱 13. PADRÃO DE ARQUITETURA
 
 ### PrismaModule
 
-O projeto utiliza um módulo dedicado para o Prisma:
-
-* `PrismaModule` exporta `PrismaService`
-* Importado nos módulos:
+* Centraliza o PrismaService
+* Importado pelos módulos:
 
   * ResidentsModule
   * EmployeesModule
 
-✔ Evita múltiplas conexões com o banco
-✔ Evita dependências circulares
+✔ Evita múltiplas conexões
+✔ Evita dependência circular
 ✔ Mantém arquitetura limpa
 
 ---
 
-## 🎯 14. FILOSOFIA DE DESENVOLVIMENTO
+## 🎯 14. FILOSOFIA
 
-* Kaizen (incremental)
-* Escopo controlado por ticket
+* Kaizen
+* Evolução incremental
 * Sem overengineering
-* Evolução guiada por necessidade real
+* Escopo controlado por ticket
 
 ---
 
 ## 🚫 15. REGRAS DO PROJETO
 
-* Não implementar fora do ticket
 * Não adicionar libs sem aprovação
 * Não alterar infraestrutura sem revisão
 * Não quebrar funcionalidades existentes
@@ -275,14 +262,14 @@ O projeto utiliza um módulo dedicado para o Prisma:
 ### Backend
 
 * Controller → HTTP
-* Service → lógica + Prisma
+* Service → regras de negócio
 * DTO → validação
 
 ### Frontend
 
-* Fetch centralizado em `lib/`
+* Fetch centralizado em `/lib`
 * CSS Modules
-* Componentes simples e reutilizáveis
+* Componentes reutilizáveis
 
 ---
 
@@ -296,22 +283,22 @@ O projeto utiliza um módulo dedicado para o Prisma:
 * ✅ T-006 — CRUD residentes backend
 * ✅ T-007 — Front residentes
 * ✅ T-008 — Gestão completa residentes
-* ✅ T-009 — Módulo de funcionários (backend)
+* ✅ T-009 — Funcionários backend
+* ✅ T-010 — Funcionários frontend
 
 ---
 
 ## 🚀 18. PRÓXIMOS PASSOS
 
-* T-010 — Frontend de Funcionários
-* T-011 — Prontuários médicos
-* T-012 — Financeiro (livro caixa)
-* T-013 — Refinamento de UX
+* T-011 — Refinamento de UX
+* T-012 — Prontuários médicos
+* T-013 — Financeiro (livro caixa)
 
 ---
 
-## 🧠 19. ORGANIZAÇÃO DO TIME
+## 🧠 19. TIME
 
-* Product Owner / Líder Técnico → você
+* Product Owner → você
 * Desenvolvedor → Gemini
 * Arquiteto / CTO → ChatGPT
 
@@ -319,11 +306,10 @@ O projeto utiliza um módulo dedicado para o Prisma:
 
 ## 📎 20. OBSERVAÇÃO FINAL
 
-Antes de avançar para novos tickets, sempre validar:
+Sempre validar:
 
-* logs do backend
-* comportamento da API
-* testes via curl
-* funcionamento do fluxo completo
+* API via curl
+* Fluxo completo na UI
+* Logs do backend
 
----
+Antes de avançar para o próximo ticket.
