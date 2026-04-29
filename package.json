@@ -8,5 +8,8 @@
   },
   "scripts": {
     "dev": "docker compose up --build"
+  },
+  "dependencies": {
+    "install": "^0.13.0"
   }
 }

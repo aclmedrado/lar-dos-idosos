@@ -10,13 +10,15 @@ Sistema web para gestão de um lar de idosos, desenvolvido com foco em:
 * Evolução incremental (kaizen)
 * Código limpo e sustentável
 
-### Módulos planejados
+---
+
+### Módulos do sistema
 
 * Dashboard
-* Residentes
-* Funcionários
-* Prontuários
-* Financeiro (Livro Caixa)
+* Residentes ✅
+* Funcionários ✅
+* Prontuários (em breve)
+* Financeiro (em breve)
 
 ---
 
@@ -26,7 +28,7 @@ Sistema web para gestão de um lar de idosos, desenvolvido com foco em:
 
 * Backend: NestJS + TypeScript
 * Frontend: Next.js 15 (App Router)
-* Banco de dados: PostgreSQL 18
+* Banco de dados: PostgreSQL
 * ORM: Prisma
 * Infraestrutura: Docker Compose
 * Monorepo: pnpm workspaces
@@ -44,7 +46,7 @@ lar-dos-idosos/
 ├── .env
 ├── .env.example
 ├── pnpm-workspace.yaml
-├── README.md
+└── README.md
 ```
 
 ---
@@ -55,7 +57,7 @@ lar-dos-idosos/
 
 * Windows 11 + WSL
 * Docker + Docker Compose
-* Node.js 24
+* Node.js
 * pnpm
 
 ---
@@ -102,37 +104,28 @@ DATABASE_URL="postgresql://postgres:postgres@db:5432/lar_idosos_db?schema=public
 
 ---
 
-## 🔧 6. MIGRATIONS (IMPORTANTE)
-
-### Executar migration no monorepo
+## 🔧 6. MIGRATIONS
 
 ```bash
-docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev --name init
+docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev
 ```
 
 ---
 
-### Gerar Prisma Client
+## ⚠️ 7. REGRA DO MONOREPO
+
+* Container roda em: `/usr/src/app`
+* Prisma está em: `/usr/src/app/apps/api`
+
+✔ Sempre usar:
 
 ```bash
-docker compose exec -w /usr/src/app/apps/api api pnpm prisma generate
+docker compose exec -w /usr/src/app/apps/api api ...
 ```
 
 ---
 
-## ⚠️ 7. REGRA DO MONOREPO (CRÍTICA)
-
-* O container roda em: `/usr/src/app`
-* O Prisma está em: `/usr/src/app/apps/api`
-
-✔ Portanto:
-
-* Sempre usar `-w /usr/src/app/apps/api`
-* OU usar `pnpm --filter`
-
----
-
-## 📡 8. BACKEND (NESTJS)
+## 📡 8. BACKEND
 
 ### Endpoint de saúde
 
@@ -144,7 +137,7 @@ GET /health
 
 ## 🧩 9. API DE RESIDENTES
 
-CRUD completo de residentes disponível no backend.
+CRUD completo de residentes.
 
 ### Endpoints
 
@@ -158,49 +151,63 @@ DELETE /residents/:id
 
 ---
 
-### Criar residente
+### Regras
 
-```bash
-curl -X POST http://localhost:3333/residents \
--H "Content-Type: application/json" \
--d '{"fullName": "Maria da Silva", "birthDate": "1940-05-10", "documentId": "12345678900"}'
+* `fullName` obrigatório
+* `birthDate` obrigatório
+* `documentId` opcional (único)
+* Soft delete com `status = INACTIVE`
+
+---
+
+## 🧩 10. API DE FUNCIONÁRIOS
+
+CRUD completo de funcionários.
+
+### Endpoints
+
+```http
+GET    /employees
+GET    /employees/:id
+POST   /employees
+PATCH  /employees/:id
+DELETE /employees/:id
 ```
 
 ---
 
-### Atualizar residente
+### Criar funcionário
 
 ```bash
-curl -X PATCH http://localhost:3333/residents/SEU_ID_AQUI \
+curl -X POST http://localhost:3333/employees \
 -H "Content-Type: application/json" \
--d '{"fullName": "Maria Aparecida da Silva"}'
-```
-
----
-
-### Inativar residente (soft delete)
-
-```bash
-curl -X DELETE http://localhost:3333/residents/SEU_ID_AQUI
+-d '{"fullName": "João Silva", "role": "Cuidador"}'
 ```
 
 ---
 
 ### Regras
 
-* `fullName` obrigatório na criação
-* `birthDate` obrigatório (ISO)
-* `documentId` opcional
-* UUID inválido → 400
-* não encontrado → 404
-* documento duplicado → 409
-* DELETE não remove do banco → apenas `status = INACTIVE`
+* `fullName` obrigatório
+* `role` obrigatório
+* `documentId` opcional (único)
+* `email` opcional (validado)
+* `phone` opcional
+* Soft delete com `status = INACTIVE`
 
 ---
 
-## 💻 10. FRONTEND — RESIDENTES
+### Validações
 
-### Página
+* UUID inválido → 400
+* não encontrado → 404
+* documento duplicado → 409
+
+---
+
+## 💻 11. FRONTEND
+
+### Página de residentes
 
 ```txt
 http://localhost:3000/residentes
@@ -208,37 +215,17 @@ http://localhost:3000/residentes
 
 ---
 
-### Funcionalidades implementadas
+### Funcionalidades
 
-* Listagem de residentes via API
-* Cadastro de residente
-* Edição de residente
-* Inativação (soft delete)
-* Atualização automática da lista
-* Feedback de erro e sucesso
-
----
-
-### Fluxo de uso
-
-1. Criar residente pelo formulário
-2. Visualizar na lista
-3. Editar clicando em “Editar”
-4. Cancelar edição se necessário
-5. Inativar clicando em “Inativar”
+* Listagem via API
+* Cadastro
+* Edição
+* Inativação
+* Feedback de erro/sucesso
 
 ---
 
-### Regras de UI
-
-* Residentes inativos permanecem visíveis
-* Linhas inativas possuem aparência reduzida
-* Botão de inativar fica desabilitado após uso
-* Formulário alterna entre modo criação e edição
-
----
-
-## 🌐 11. VARIÁVEIS DE AMBIENTE (FRONTEND)
+## 🌐 12. VARIÁVEIS DE AMBIENTE (FRONTEND)
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3333
@@ -246,16 +233,34 @@ NEXT_PUBLIC_API_URL=http://localhost:3333
 
 ---
 
-## 🎯 12. FILOSOFIA DE DESENVOLVIMENTO
+## 🧱 13. PADRÃO DE ARQUITETURA (IMPORTANTE)
 
-* Kaizen (incremental)
-* Escopo por ticket
-* Sem overengineering
-* Sem antecipação de complexidade
+### PrismaModule
+
+O projeto utiliza um módulo dedicado para o Prisma:
+
+* `PrismaModule` exporta `PrismaService`
+* Importado nos módulos:
+
+  * ResidentsModule
+  * EmployeesModule
+
+✔ Evita múltiplas conexões com o banco
+✔ Evita dependências circulares
+✔ Mantém arquitetura limpa
 
 ---
 
-## 🚫 13. REGRAS DO PROJETO
+## 🎯 14. FILOSOFIA DE DESENVOLVIMENTO
+
+* Kaizen (incremental)
+* Escopo controlado por ticket
+* Sem overengineering
+* Evolução guiada por necessidade real
+
+---
+
+## 🚫 15. REGRAS DO PROJETO
 
 * Não implementar fora do ticket
 * Não adicionar libs sem aprovação
@@ -265,7 +270,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3333
 
 ---
 
-## 📌 14. CONVENÇÕES
+## 📌 16. CONVENÇÕES
 
 ### Backend
 
@@ -275,38 +280,36 @@ NEXT_PUBLIC_API_URL=http://localhost:3333
 
 ### Frontend
 
-* Client Components para interação
 * Fetch centralizado em `lib/`
 * CSS Modules
-* Componentes pequenos e reutilizáveis
+* Componentes simples e reutilizáveis
 
 ---
 
-## 📍 15. STATUS DO PROJETO
+## 📍 17. STATUS DO PROJETO
 
 * ✅ T-001 — Bootstrap
 * ✅ T-002 — Layout base
 * ✅ T-003 — Dashboard mockado
 * ✅ T-004 — Prisma + migration
-* ✅ T-005 — API inicial de residentes
-* ✅ T-006 — CRUD backend completo
-* ✅ T-007 — Front consumindo API
-* ✅ T-008 — Gestão completa no frontend
+* ✅ T-005 — API residentes
+* ✅ T-006 — CRUD residentes backend
+* ✅ T-007 — Front residentes
+* ✅ T-008 — Gestão completa residentes
+* ✅ T-009 — Módulo de funcionários (backend)
 
 ---
 
-## 🚀 16. PRÓXIMOS PASSOS
+## 🚀 18. PRÓXIMOS PASSOS
 
-Possíveis evoluções:
-
-* T-009 — Refinamento de UX
-* T-010 — Módulo de Funcionários
+* T-010 — Frontend de Funcionários
 * T-011 — Prontuários médicos
 * T-012 — Financeiro (livro caixa)
+* T-013 — Refinamento de UX
 
 ---
 
-## 🧠 17. ORGANIZAÇÃO DO TIME
+## 🧠 19. ORGANIZAÇÃO DO TIME
 
 * Product Owner / Líder Técnico → você
 * Desenvolvedor → Gemini
@@ -314,13 +317,13 @@ Possíveis evoluções:
 
 ---
 
-## 📎 18. OBSERVAÇÃO FINAL
+## 📎 20. OBSERVAÇÃO FINAL
 
-Sempre validar:
+Antes de avançar para novos tickets, sempre validar:
 
-* logs reais
-* testes via UI
+* logs do backend
+* comportamento da API
 * testes via curl
-* comportamento completo do fluxo
+* funcionamento do fluxo completo
 
-Antes de avançar para o próximo ticket.
+---
