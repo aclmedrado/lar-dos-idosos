@@ -7,7 +7,7 @@
 .formGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .label {
@@ -17,17 +17,19 @@
 }
 
 .input {
-  padding: 0.65rem;
+  padding: 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 0.95rem;
   background-color: transparent;
   color: var(--text-main);
   outline: none;
+  transition: all 0.2s ease;
 }
 
 .input:focus {
   border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .buttonGroup {
@@ -45,11 +47,12 @@
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s ease;
 }
 
 .button:hover:not(:disabled) {
   opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 .button:disabled {
@@ -65,7 +68,7 @@
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .cancelButton:hover:not(:disabled) {
@@ -76,20 +79,4 @@
 .cancelButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.error {
-  padding: 0.75rem;
-  background-color: #fee2e2;
-  color: #b91c1c;
-  border-radius: 6px;
-  font-size: 0.9rem;
-}
-
-.success {
-  padding: 0.75rem;
-  background-color: #dcfce7;
-  color: #166534;
-  border-radius: 6px;
-  font-size: 0.9rem;
 }

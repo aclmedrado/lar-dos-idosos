@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
+import { Feedback } from '@/components/ui/feedback';
 import { createResident, updateResident } from '@/lib/residents';
 import { Resident } from '@/types/resident';
-import styles from './residents-form.module.css';
+import styles from '@/components/ui/form/form.module.css';
 
 interface ResidentsFormProps {
   onSuccess: () => void;
@@ -67,6 +68,7 @@ export function ResidentsForm({ onSuccess, editingResident, onCancelEdit }: Resi
       setDocumentId('');
       onSuccess();
       
+      setTimeout(() => setSuccess(null), 4000);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro ao processar residente.';
       setError(message);
@@ -78,8 +80,9 @@ export function ResidentsForm({ onSuccess, editingResident, onCancelEdit }: Resi
   return (
     <Card title={editingResident ? "Editar Residente" : "Novo Residente"}>
       <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={styles.error}>{error}</div>}
-        {success && <div className={styles.success}>{success}</div>}
+        
+        {error && <Feedback type="error" message={error} />}
+        {success && <Feedback type="success" message={success} />}
 
         <div className={styles.formGroup}>
           <label htmlFor="fullName" className={styles.label}>Nome Completo *</label>
@@ -122,8 +125,8 @@ export function ResidentsForm({ onSuccess, editingResident, onCancelEdit }: Resi
         <div className={styles.buttonGroup}>
           <button type="submit" className={styles.button} disabled={isLoading}>
             {isLoading 
-              ? 'Salvando...' 
-              : editingResident ? 'Salvar alterações' : 'Cadastrar Residente'}
+              ? (editingResident ? 'Salvando...' : 'Cadastrando...') 
+              : (editingResident ? 'Salvar alterações' : 'Cadastrar Residente')}
           </button>
           
           {editingResident && (

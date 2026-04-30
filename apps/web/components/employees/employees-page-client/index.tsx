@@ -12,6 +12,7 @@ export function EmployeesPageClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<{type: 'success'|'error', msg: string} | null>(null);
 
   const fetchEmployees = useCallback(async () => {
     setIsLoading(true);
@@ -33,6 +34,7 @@ export function EmployeesPageClient() {
 
   const handleEdit = (employee: Employee) => {
     setEditingEmployee(employee);
+    setActionFeedback(null);
   };
 
   const handleCancelEdit = () => {
@@ -43,12 +45,13 @@ export function EmployeesPageClient() {
     if (window.confirm('Tem certeza que deseja inativar este funcionário?')) {
       try {
         await deleteEmployee(id);
-        alert('Funcionário inativado com sucesso!');
+        setActionFeedback({ type: 'success', msg: 'Funcionário inativado com sucesso!' });
         fetchEmployees();
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Erro ao inativar funcionário.';
-        alert(message);
+        setActionFeedback({ type: 'error', msg: message });
       }
+      setTimeout(() => setActionFeedback(null), 5000);
     }
   };
 
@@ -59,6 +62,7 @@ export function EmployeesPageClient() {
           onSuccess={() => {
             fetchEmployees();
             setEditingEmployee(null);
+            setActionFeedback(null);
           }} 
           editingEmployee={editingEmployee}
           onCancelEdit={handleCancelEdit}
@@ -71,6 +75,7 @@ export function EmployeesPageClient() {
           error={error} 
           onEdit={handleEdit}
           onInactivate={handleInactivate}
+          actionFeedback={actionFeedback}
         />
       </div>
     </div>

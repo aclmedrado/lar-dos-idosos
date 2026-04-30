@@ -1,0 +1,51 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.feedbackMsg {
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.th {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+.table tbody tr:last-child .td {
+  border-bottom: none;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionBtnEdit,
+.actionBtnDelete {
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-weight: 500;
+}

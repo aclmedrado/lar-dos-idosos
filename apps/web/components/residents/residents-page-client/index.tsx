@@ -12,6 +12,7 @@ export function ResidentsPageClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingResident, setEditingResident] = useState<Resident | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<{type: 'success'|'error', msg: string} | null>(null);
 
   const fetchResidents = useCallback(async () => {
     setIsLoading(true);
@@ -33,6 +34,7 @@ export function ResidentsPageClient() {
 
   const handleEdit = (resident: Resident) => {
     setEditingResident(resident);
+    setActionFeedback(null);
   };
 
   const handleCancelEdit = () => {
@@ -43,12 +45,14 @@ export function ResidentsPageClient() {
     if (window.confirm('Tem certeza que deseja inativar este residente?')) {
       try {
         await deleteResident(id);
-        alert('Residente inativado com sucesso!');
-        fetchResidents(); // Atualiza a lista após exclusão lógica
+        setActionFeedback({ type: 'success', msg: 'Residente inativado com sucesso!' });
+        fetchResidents();
       } catch (err: unknown) {
         const message = err instanceof Error ? err.message : 'Erro ao inativar residente.';
-        alert(message);
+        setActionFeedback({ type: 'error', msg: message });
       }
+      // Limpa a mensagem após 5 segundos
+      setTimeout(() => setActionFeedback(null), 5000);
     }
   };
 
@@ -59,6 +63,7 @@ export function ResidentsPageClient() {
           onSuccess={() => {
             fetchResidents();
             setEditingResident(null);
+            setActionFeedback(null);
           }} 
           editingResident={editingResident}
           onCancelEdit={handleCancelEdit}
@@ -71,6 +76,7 @@ export function ResidentsPageClient() {
           error={error} 
           onEdit={handleEdit}
           onInactivate={handleInactivate}
+          actionFeedback={actionFeedback}
         />
       </div>
     </div>

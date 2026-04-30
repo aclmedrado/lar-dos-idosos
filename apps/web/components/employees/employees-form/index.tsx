@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
+import { Feedback } from '@/components/ui/feedback';
 import { createEmployee, updateEmployee } from '@/lib/employees';
 import { Employee } from '@/types/employee';
-import styles from './employees-form.module.css';
+import styles from '@/components/ui/form/form.module.css';
 
 interface EmployeesFormProps {
   onSuccess: () => void;
@@ -77,6 +78,7 @@ export function EmployeesForm({ onSuccess, editingEmployee, onCancelEdit }: Empl
       setEmail('');
       onSuccess();
       
+      setTimeout(() => setSuccess(null), 4000);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erro ao processar funcionário.';
       setError(message);
@@ -88,8 +90,9 @@ export function EmployeesForm({ onSuccess, editingEmployee, onCancelEdit }: Empl
   return (
     <Card title={editingEmployee ? "Editar Funcionário" : "Novo Funcionário"}>
       <form onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={styles.error}>{error}</div>}
-        {success && <div className={styles.success}>{success}</div>}
+        
+        {error && <Feedback type="error" message={error} />}
+        {success && <Feedback type="success" message={success} />}
 
         <div className={styles.formGroup}>
           <label htmlFor="fullName" className={styles.label}>Nome Completo *</label>
@@ -159,8 +162,8 @@ export function EmployeesForm({ onSuccess, editingEmployee, onCancelEdit }: Empl
         <div className={styles.buttonGroup}>
           <button type="submit" className={styles.button} disabled={isLoading}>
             {isLoading 
-              ? 'Salvando...' 
-              : editingEmployee ? 'Salvar alterações' : 'Cadastrar Funcionário'}
+              ? (editingEmployee ? 'Salvando...' : 'Cadastrando...') 
+              : (editingEmployee ? 'Salvar alterações' : 'Cadastrar Funcionário')}
           </button>
           
           {editingEmployee && (
