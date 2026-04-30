@@ -56,6 +56,8 @@ model Resident {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
 
+  medicalRecord MedicalRecord?
+
   @@map("residents")
 }
 
@@ -92,4 +94,23 @@ model AuditLog {
   createdAt  DateTime @default(now())
 
   @@map("audit_logs")
+}
+
+model MedicalRecord {
+  id                       String   @id @default(uuid())
+  residentId               String   @unique
+  resident                 Resident @relation(fields: [residentId], references: [id])
+
+  allergies                String?
+  chronicDiseases          String?
+  disabilities             String?
+  usesContinuousMedication Boolean  @default(false)
+  currentMedications       String?
+  medicalHistory           String?
+  notes                    String?
+
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  @@map("medical_records")
 }

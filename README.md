@@ -23,10 +23,11 @@ O projeto segue uma abordagem **Kaizen**, com entregas pequenas, revisadas e val
 - Dashboard
 - Residentes
 - Funcionários
+- Prontuários médicos — backend
 
 ### Planejados
 
-- Prontuários médicos
+- Prontuários médicos — frontend
 - Financeiro / Livro caixa
 - Autenticação e controle de acesso
 - Auditoria
@@ -142,7 +143,7 @@ docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev
 Exemplo:
 
 ```bash
-docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev --name add_employee
+docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev --name add_medical_record
 ```
 
 ---
@@ -151,6 +152,14 @@ docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev --name 
 
 ```bash
 docker compose exec -w /usr/src/app/apps/api api pnpm prisma generate
+```
+
+---
+
+### Validar schema Prisma
+
+```bash
+docker compose exec -w /usr/src/app/apps/api api pnpm prisma validate
 ```
 
 ---
@@ -210,6 +219,7 @@ O `PrismaModule`:
 
 - `ResidentsModule`
 - `EmployeesModule`
+- `MedicalRecordsModule`
 
 ### Regra
 
@@ -361,7 +371,120 @@ curl -X DELETE http://localhost:3333/employees/SEU_ID_AQUI
 
 ---
 
-## 💻 14. FRONTEND
+## 🧩 14. API DE PRONTUÁRIOS MÉDICOS
+
+Backend do módulo de prontuários médicos.
+
+Cada residente pode possuir **apenas um prontuário médico**.
+
+### Endpoints
+
+```http
+GET   /medical-records
+GET   /medical-records/:id
+GET   /medical-records/resident/:residentId
+POST  /medical-records
+PATCH /medical-records/:id
+```
+
+Não existe endpoint `DELETE` neste módulo.
+
+---
+
+### Criar prontuário
+
+```bash
+curl -X POST http://localhost:3333/medical-records \
+-H "Content-Type: application/json" \
+-d '{
+  "residentId": "UUID_DO_RESIDENTE",
+  "allergies": "Dipirona",
+  "chronicDiseases": "Hipertensão",
+  "disabilities": "Mobilidade reduzida",
+  "usesContinuousMedication": true,
+  "currentMedications": "Losartana 50mg",
+  "medicalHistory": "Histórico médico resumido.",
+  "notes": "Acompanhamento mensal."
+}'
+```
+
+---
+
+### Listar prontuários
+
+```bash
+curl http://localhost:3333/medical-records
+```
+
+A resposta inclui dados básicos do residente vinculado:
+
+```json
+{
+  "resident": {
+    "id": "uuid",
+    "fullName": "Nome do residente",
+    "status": "ACTIVE"
+  }
+}
+```
+
+---
+
+### Buscar prontuário por ID
+
+```bash
+curl http://localhost:3333/medical-records/UUID_DO_PRONTUARIO
+```
+
+---
+
+### Buscar prontuário por residente
+
+```bash
+curl http://localhost:3333/medical-records/resident/UUID_DO_RESIDENTE
+```
+
+---
+
+### Atualizar prontuário
+
+```bash
+curl -X PATCH http://localhost:3333/medical-records/UUID_DO_PRONTUARIO \
+-H "Content-Type: application/json" \
+-d '{
+  "notes": "Observação atualizada.",
+  "usesContinuousMedication": false
+}'
+```
+
+---
+
+### Regras
+
+- `residentId` é obrigatório na criação
+- `residentId` precisa ser UUID válido
+- residente precisa existir
+- cada residente pode ter apenas um prontuário
+- segundo prontuário para o mesmo residente retorna `409`
+- prontuário inexistente retorna `404`
+- residente inexistente retorna `404`
+- residente existente sem prontuário retorna `404`
+- UUID inválido retorna `400`
+- `usesContinuousMedication` deve ser booleano
+- `residentId` não pode ser alterado via `PATCH`
+- não há exclusão de prontuário no MVP
+
+---
+
+### Migration
+
+```bash
+docker compose exec -w /usr/src/app/apps/api api pnpm prisma migrate dev --name add_medical_record
+```
+
+---
+
+## 💻 15. FRONTEND
 
 ### Página de Dashboard
 
@@ -413,7 +536,15 @@ Funcionalidades:
 
 ---
 
-## 🌐 15. VARIÁVEIS DE AMBIENTE DO FRONTEND
+### Página de Prontuários
+
+Ainda não implementada.
+
+O backend de prontuários foi concluído no T-012. O frontend será tratado em ticket próprio.
+
+---
+
+## 🌐 16. VARIÁVEIS DE AMBIENTE DO FRONTEND
 
 No `.env`:
 
@@ -425,7 +556,7 @@ O frontend usa essa variável para consumir a API NestJS.
 
 ---
 
-## 🎨 16. PADRÃO DE UI DO FRONTEND
+## 🎨 17. PADRÃO DE UI DO FRONTEND
 
 Após o T-011, o projeto passou a ter componentes e CSS compartilhados para evitar duplicação e manter consistência visual.
 
@@ -449,7 +580,7 @@ apps/web/components/ui/
 
 ---
 
-## 🟢 17. COMPONENTE FEEDBACK
+## 🟢 18. COMPONENTE FEEDBACK
 
 Usado para mensagens visuais de sucesso, erro ou informação.
 
@@ -469,7 +600,7 @@ Não usar `alert()` para mensagens de sucesso ou erro.
 
 ---
 
-## 🏷️ 18. COMPONENTE BADGE
+## 🏷️ 19. COMPONENTE BADGE
 
 Usado para exibir status visual.
 
@@ -491,7 +622,7 @@ INACTIVE -> Inativo
 
 ---
 
-## 🧾 19. PADRÃO DE FORMULÁRIOS
+## 🧾 20. PADRÃO DE FORMULÁRIOS
 
 O CSS comum de formulários fica em:
 
@@ -519,7 +650,7 @@ Só criar CSS específico de formulário se houver diferença real daquele módu
 
 ---
 
-## 📊 20. PADRÃO DE TABELAS E LISTAS
+## 📊 21. PADRÃO DE TABELAS E LISTAS
 
 O CSS comum de tabelas fica em:
 
@@ -567,7 +698,7 @@ Usar o CSS local do módulo apenas para diferenças reais:
 
 ---
 
-## 🧹 21. ARQUIVOS REMOVIDOS NO T-011
+## 🧹 22. ARQUIVOS REMOVIDOS NO T-011
 
 Estes arquivos foram removidos porque o CSS de formulário foi centralizado:
 
@@ -580,7 +711,7 @@ Não recriar esses arquivos sem necessidade real.
 
 ---
 
-## 🧭 22. REGRAS DE QUALIDADE
+## 🧭 23. REGRAS DE QUALIDADE
 
 ### Backend
 
@@ -589,7 +720,8 @@ Não recriar esses arquivos sem necessidade real.
 - usar `ParseUUIDPipe` em parâmetros `id`;
 - manter service simples;
 - tratar `404`, `400` e `409` quando aplicável;
-- não criar abstrações antes da necessidade.
+- não criar abstrações antes da necessidade;
+- entregar arquivos críticos completos, especialmente `schema.prisma`.
 
 ### Frontend
 
@@ -603,7 +735,7 @@ Não recriar esses arquivos sem necessidade real.
 
 ---
 
-## 🚫 23. REGRAS DO PROJETO
+## 🚫 24. REGRAS DO PROJETO
 
 - Não implementar fora do ticket atual.
 - Não adicionar bibliotecas sem aprovação.
@@ -612,25 +744,37 @@ Não recriar esses arquivos sem necessidade real.
 - Não duplicar CSS compartilhável.
 - Não substituir README parcialmente sem orientação.
 - Não commitar arquivos locais de ferramenta, como `.codex/`.
+- Não executar migrations sem revisão prévia quando houver alteração de schema.
 
 ---
 
-## 🤖 24. USO DO CODEX CLI
+## 🤖 25. USO DO CODEX CLI
 
 O Codex CLI pode ser usado para tarefas pequenas e localizadas, como:
 
 - refatoração de CSS;
 - ajustes pontuais de tipagem;
 - remoção de duplicação;
-- correções simples em um conjunto limitado de arquivos.
+- correções simples em um conjunto limitado de arquivos;
+- smoke tests via `curl`.
 
 ### Regra
 
 Codex não deve ser usado para decisões arquiteturais, migrations, Docker ou novos módulos completos sem revisão do Arquiteto.
 
+### Observação sobre testes contra localhost
+
+Para o Codex acessar a API local em `localhost`, pode ser necessário habilitar rede:
+
+```bash
+codex exec -c sandbox_workspace_write.network_access=true "..."
+```
+
+Sem essa flag, o Codex pode falhar com erro de conexão mesmo que a API esteja rodando.
+
 ---
 
-## 📍 25. STATUS DO PROJETO
+## 📍 26. STATUS DO PROJETO
 
 - ✅ T-001 — Bootstrap
 - ✅ T-002 — Layout base
@@ -643,28 +787,32 @@ Codex não deve ser usado para decisões arquiteturais, migrations, Docker ou no
 - ✅ T-009 — Funcionários backend
 - ✅ T-010 — Funcionários frontend
 - ✅ T-011 — Refinamento global de UX
+- ✅ T-012 — Prontuários médicos backend
 
 ---
 
-## 🚀 26. PRÓXIMOS PASSOS
+## 🚀 27. PRÓXIMOS PASSOS
 
 Possíveis próximos tickets:
 
-- T-012 — Prontuários médicos
-- T-013 — Financeiro / livro caixa
-- T-014 — Autenticação
-- T-015 — Auditoria
-- T-016 — Testes automatizados
+- T-013 — Prontuários médicos frontend
+- T-014 — Financeiro / livro caixa backend
+- T-015 — Financeiro / livro caixa frontend
+- T-016 — Dashboard com dados reais
+- T-017 — Autenticação
+- T-018 — Controle de acesso
+- T-019 — Auditoria
+- T-020 — Testes automatizados
 
 Recomendação atual:
 
 ```txt
-T-012 — Prontuários médicos
+T-013 — Prontuários médicos frontend
 ```
 
 ---
 
-## 🧠 27. ORGANIZAÇÃO DO TIME
+## 🧠 28. ORGANIZAÇÃO DO TIME
 
 - Product Owner / Líder Técnico: usuário
 - Desenvolvedor: Gemini
@@ -673,7 +821,7 @@ T-012 — Prontuários médicos
 
 ---
 
-## 📎 28. CHECKLIST ANTES DE AVANÇAR TICKET
+## 📎 29. CHECKLIST ANTES DE AVANÇAR TICKET
 
 Antes de considerar um ticket concluído:
 
@@ -682,6 +830,8 @@ Antes de considerar um ticket concluído:
 - logs não mostram exceções;
 - fluxo principal foi testado na UI;
 - endpoints críticos foram testados com curl quando aplicável;
+- `prisma validate` foi executado quando houve alteração no schema;
+- migration foi aplicada quando necessária;
 - `git status --short` foi revisado;
 - arquivos novos foram identificados;
 - arquivos locais indevidos foram ignorados;
