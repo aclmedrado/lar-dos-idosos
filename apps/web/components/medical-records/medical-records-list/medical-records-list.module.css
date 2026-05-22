@@ -1,0 +1,43 @@
+.emptyState {
+  padding: 3rem 0;
+  text-align: center;
+  color: var(--text-muted, #6b7280);
+  font-size: 0.95rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d1d5db;
+}
+
+.td {
+  transition: all 0.2s ease;
+}
+
+.activeRow:hover .td {
+  background-color: #f9fafb;
+}
+
+.inactiveRow {
+  opacity: 0.55;
+  background-color: #fcfcfc;
+}
+
+.subtext {
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+  margin-top: 0.2rem;
+  display: block;
+}
+
+.mutedText {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.neutralText {
+  color: #4b5563;
+}
+
+.positiveText {
+  color: #059669;
+  font-weight: 600;
+}

@@ -1,3 +1,5 @@
+import type { BadgeStatus } from '@/components/ui/badge';
+
 export interface Employee {
   id: string;
   fullName: string;
@@ -5,7 +7,7 @@ export interface Employee {
   documentId?: string | null;
   phone?: string | null;
   email?: string | null;
-  status: string;
+  status: BadgeStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -24,5 +26,5 @@ export interface UpdateEmployeeInput {
   documentId?: string;
   phone?: string;
   email?: string;
-  status?: string;
+  status?: BadgeStatus;
 }

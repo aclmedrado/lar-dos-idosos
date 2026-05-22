@@ -23,15 +23,15 @@ O projeto segue uma abordagem **Kaizen**, com entregas pequenas, revisadas e val
 - Dashboard
 - Residentes
 - Funcionários
-- Prontuários médicos — backend
+- Prontuários médicos
 
 ### Planejados
 
-- Prontuários médicos — frontend
 - Financeiro / Livro caixa
 - Autenticação e controle de acesso
 - Auditoria
 - Relatórios
+- Testes automatizados
 
 ---
 
@@ -61,6 +61,7 @@ lar-dos-idosos/
 ├── .env
 ├── .env.example
 ├── pnpm-workspace.yaml
+├── AGENTS.md
 └── README.md
 ```
 
@@ -536,11 +537,25 @@ Funcionalidades:
 
 ---
 
-### Página de Prontuários
+### Página de Prontuários Médicos
 
-Ainda não implementada.
+```txt
+http://localhost:3000/prontuarios
+```
 
-O backend de prontuários foi concluído no T-012. O frontend será tratado em ticket próprio.
+Funcionalidades:
+
+- listagem de prontuários via API;
+- cadastro de prontuário para residente sem prontuário;
+- edição de prontuário existente;
+- cancelamento de edição;
+- feedback visual de sucesso/erro/info;
+- badge de status do residente;
+- estado vazio;
+- estado de carregamento;
+- bloqueio visual para evitar segundo prontuário do mesmo residente;
+- sem botão de exclusão;
+- sem chamada `DELETE`.
 
 ---
 
@@ -556,7 +571,37 @@ O frontend usa essa variável para consumir a API NestJS.
 
 ---
 
-## 🎨 17. PADRÃO DE UI DO FRONTEND
+## 🔌 17. CAMADAS DE API DO FRONTEND
+
+As chamadas HTTP devem ficar centralizadas na pasta:
+
+```txt
+apps/web/lib/
+```
+
+### Camadas existentes
+
+```txt
+apps/web/lib/residents.ts
+apps/web/lib/employees.ts
+apps/web/lib/medical-records.ts
+```
+
+### Medical Records
+
+```ts
+getMedicalRecords()
+getMedicalRecordById(id)
+getMedicalRecordByResidentId(residentId)
+createMedicalRecord(data)
+updateMedicalRecord(id, data)
+```
+
+Não espalhar `fetch` diretamente dentro de componentes.
+
+---
+
+## 🎨 18. PADRÃO DE UI DO FRONTEND
 
 Após o T-011, o projeto passou a ter componentes e CSS compartilhados para evitar duplicação e manter consistência visual.
 
@@ -580,7 +625,7 @@ apps/web/components/ui/
 
 ---
 
-## 🟢 18. COMPONENTE FEEDBACK
+## 🟢 19. COMPONENTE FEEDBACK
 
 Usado para mensagens visuais de sucesso, erro ou informação.
 
@@ -600,7 +645,7 @@ Não usar `alert()` para mensagens de sucesso ou erro.
 
 ---
 
-## 🏷️ 19. COMPONENTE BADGE
+## 🏷️ 20. COMPONENTE BADGE
 
 Usado para exibir status visual.
 
@@ -611,18 +656,27 @@ import { Badge } from '@/components/ui/badge';
 
 <Badge status={resident.status} />
 <Badge status={employee.status} />
+<Badge status={medicalRecord.resident.status} />
+```
+
+### Tipo compartilhado
+
+```ts
+export type BadgeStatus = 'ACTIVE' | 'INACTIVE' | 'HOSPITALIZED' | 'ON_LEAVE';
 ```
 
 ### Status tratados
 
 ```txt
-ACTIVE   -> Ativo
-INACTIVE -> Inativo
+ACTIVE       -> Ativo
+INACTIVE     -> Inativo
+HOSPITALIZED -> Hospitalizado
+ON_LEAVE     -> Afastado
 ```
 
 ---
 
-## 🧾 20. PADRÃO DE FORMULÁRIOS
+## 🧾 21. PADRÃO DE FORMULÁRIOS
 
 O CSS comum de formulários fica em:
 
@@ -633,7 +687,7 @@ apps/web/components/ui/form/form.module.css
 ### Uso obrigatório
 
 ```tsx
-import styles from '@/components/ui/form/form.module.css';
+import formStyles from '@/components/ui/form/form.module.css';
 ```
 
 ### Regra
@@ -648,9 +702,17 @@ algum-modulo-form.module.css
 
 Só criar CSS específico de formulário se houver diferença real daquele módulo.
 
+Exemplo válido:
+
+```txt
+apps/web/components/medical-records/medical-records-form/medical-records-form.module.css
+```
+
+Usado apenas para estilos específicos do checkbox de medicação contínua.
+
 ---
 
-## 📊 21. PADRÃO DE TABELAS E LISTAS
+## 📊 22. PADRÃO DE TABELAS E LISTAS
 
 O CSS comum de tabelas fica em:
 
@@ -662,7 +724,7 @@ apps/web/components/ui/table/table.module.css
 
 ```tsx
 import tableStyles from '@/components/ui/table/table.module.css';
-import styles from './nome-do-modulo-list.module.css';
+import localStyles from './nome-do-modulo-list.module.css';
 ```
 
 ### Regra
@@ -684,6 +746,9 @@ Usar o CSS local do módulo apenas para diferenças reais:
 - `activeRow`
 - `inactiveRow`
 - `subtext`
+- `mutedText`
+- `neutralText`
+- `positiveText`
 - ajustes específicos do módulo
 
 ---
@@ -691,14 +756,14 @@ Usar o CSS local do módulo apenas para diferenças reais:
 ### Exemplo de uso
 
 ```tsx
-<td className={`${tableStyles.td} ${styles.td}`}>
+<td className={`${tableStyles.td} ${localStyles.td}`}>
   <strong>{item.fullName}</strong>
 </td>
 ```
 
 ---
 
-## 🧹 22. ARQUIVOS REMOVIDOS NO T-011
+## 🧹 23. ARQUIVOS REMOVIDOS NO T-011
 
 Estes arquivos foram removidos porque o CSS de formulário foi centralizado:
 
@@ -711,7 +776,7 @@ Não recriar esses arquivos sem necessidade real.
 
 ---
 
-## 🧭 23. REGRAS DE QUALIDADE
+## 🧭 24. REGRAS DE QUALIDADE
 
 ### Backend
 
@@ -731,11 +796,14 @@ Não recriar esses arquivos sem necessidade real.
 - centralizar chamadas HTTP em `lib/`;
 - usar CSS compartilhado quando houver padrão comum;
 - evitar duplicação de CSS;
-- manter componentes pequenos e legíveis.
+- manter componentes pequenos e legíveis;
+- evitar `style={{ ... }}` inline;
+- manter tipagens explícitas para dados vindos da API;
+- não criar botões ou chamadas destrutivas fora do escopo.
 
 ---
 
-## 🚫 24. REGRAS DO PROJETO
+## 🚫 25. REGRAS DO PROJETO
 
 - Não implementar fora do ticket atual.
 - Não adicionar bibliotecas sem aprovação.
@@ -745,10 +813,11 @@ Não recriar esses arquivos sem necessidade real.
 - Não substituir README parcialmente sem orientação.
 - Não commitar arquivos locais de ferramenta, como `.codex/`.
 - Não executar migrations sem revisão prévia quando houver alteração de schema.
+- Não fazer commit ou push sem comando explícito do usuário.
 
 ---
 
-## 🤖 25. USO DO CODEX CLI
+## 🤖 26. USO DO CODEX CLI
 
 O Codex CLI pode ser usado para tarefas pequenas e localizadas, como:
 
@@ -774,7 +843,7 @@ Sem essa flag, o Codex pode falhar com erro de conexão mesmo que a API esteja r
 
 ---
 
-## 📍 26. STATUS DO PROJETO
+## 📍 27. STATUS DO PROJETO
 
 - ✅ T-001 — Bootstrap
 - ✅ T-002 — Layout base
@@ -788,14 +857,14 @@ Sem essa flag, o Codex pode falhar com erro de conexão mesmo que a API esteja r
 - ✅ T-010 — Funcionários frontend
 - ✅ T-011 — Refinamento global de UX
 - ✅ T-012 — Prontuários médicos backend
+- ✅ T-013 — Prontuários médicos frontend
 
 ---
 
-## 🚀 27. PRÓXIMOS PASSOS
+## 🚀 28. PRÓXIMOS PASSOS
 
 Possíveis próximos tickets:
 
-- T-013 — Prontuários médicos frontend
 - T-014 — Financeiro / livro caixa backend
 - T-015 — Financeiro / livro caixa frontend
 - T-016 — Dashboard com dados reais
@@ -807,12 +876,12 @@ Possíveis próximos tickets:
 Recomendação atual:
 
 ```txt
-T-013 — Prontuários médicos frontend
+T-014 — Financeiro / livro caixa backend
 ```
 
 ---
 
-## 🧠 28. ORGANIZAÇÃO DO TIME
+## 🧠 29. ORGANIZAÇÃO DO TIME
 
 - Product Owner / Líder Técnico: usuário
 - Desenvolvedor: Gemini
@@ -821,7 +890,7 @@ T-013 — Prontuários médicos frontend
 
 ---
 
-## 📎 29. CHECKLIST ANTES DE AVANÇAR TICKET
+## 📎 30. CHECKLIST ANTES DE AVANÇAR TICKET
 
 Antes de considerar um ticket concluído:
 
@@ -832,6 +901,7 @@ Antes de considerar um ticket concluído:
 - endpoints críticos foram testados com curl quando aplicável;
 - `prisma validate` foi executado quando houve alteração no schema;
 - migration foi aplicada quando necessária;
+- `pnpm --filter @lar/web exec tsc --noEmit --incremental false` foi executado quando houve alteração relevante no frontend;
 - `git status --short` foi revisado;
 - arquivos novos foram identificados;
 - arquivos locais indevidos foram ignorados;

@@ -1,13 +1,14 @@
 import { PageHeader } from '@/components/ui/page-header';
-import { Card } from '@/components/ui/card';
+import { MedicalRecordsPageClient } from '@/components/medical-records/medical-records-page-client';
 
 export default function ProntuariosPage() {
   return (
     <div>
-      <PageHeader title="Prontuários" description="Informações médicas e de saúde." />
-      <Card>
-        <p>Gestão médica dos residentes. Contempla o registro de alergias, doenças crônicas, deficiências e controle de medicamentos de uso contínuo.</p>
-      </Card>
+      <PageHeader 
+        title="Prontuários Médicos" 
+        description="Gestão de histórico clínico e medicamentos dos residentes." 
+      />
+      <MedicalRecordsPageClient />
     </div>
   );
 }

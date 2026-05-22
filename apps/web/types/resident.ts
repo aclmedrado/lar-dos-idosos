@@ -1,9 +1,11 @@
+import type { BadgeStatus } from '@/components/ui/badge';
+
 export interface Resident {
   id: string;
   fullName: string;
   birthDate: string;
   documentId?: string | null;
-  status: string;
+  status: BadgeStatus;
   createdAt: string;
   updatedAt: string;
 }
